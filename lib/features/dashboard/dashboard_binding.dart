@@ -1,15 +1,3 @@
-// import 'package:get/get.dart';
-// import '../../data/repositories/video_repository.dart';
-// import 'dashboard_controller.dart';
-//
-// class DashboardBinding extends Bindings {
-//   @override
-//   void dependencies() {
-//     Get.lazyPut<DashboardController>(() => DashboardController(Get.find<IVideoRepository>()));
-//   }
-// }
-
-
 // package:influencer/features/dashboard/dashboard_binding.dart
 
 import 'package:get/get.dart';

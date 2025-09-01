@@ -1,18 +1,3 @@
-// class VideoLinkRequest {
-//   VideoLinkRequest({required this.url});
-//   final String url;
-//   Map<String, dynamic> toJson() => {'url': url};
-// }
-//
-// class VideoSummary {
-//   VideoSummary({required this.total, required this.views, required this.earnings});
-//   final int total;
-//   final int views;
-//   final double earnings;
-//   factory VideoSummary.mock() => VideoSummary(total: 24, views: 58200, earnings: 12500);
-// }
-
-
 // package:influencer/data/models/video_models.dart
 
 class VideoLinkRequest {

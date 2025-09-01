@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../../data/repositories/video_repository.dart';
-import '../../data/models/video_models.dart';
+import 'package:influencer/data/repositories/video_repository.dart';
+import 'package:influencer/data/models/video_models.dart';
 import '../../core/utils/validators.dart';
 
 class UploadController extends GetxController {
@@ -10,7 +10,11 @@ class UploadController extends GetxController {
   final loading = false.obs;
 
   Future<void> submit() async {
-    if (!Validators.isUrl(url.value)) { Get.snackbar('Invalid', 'Enter valid URL'); return; }
+    if (!Validators.isUrl(url.value)) {
+      Get.snackbar('Invalid', 'Enter valid URL');
+      return;
+    }
+
     loading.value = true;
     await repo.add(VideoLinkRequest(url: url.value));
     loading.value = false;
