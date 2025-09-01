@@ -45,6 +45,7 @@ dependencies:
   image_picker:
   vector_math:
   flutter_launcher_icons:
+  shared_preferences:
 
 
 flutter_icons:

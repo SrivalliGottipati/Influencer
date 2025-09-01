@@ -1,21 +1,97 @@
-import 'dart:async';
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:get/get.dart';
+// import 'app_binding.dart';
+// import 'config/app_pages.dart';
+// import 'config/app_routes.dart';
+// import 'core/theme/app_theme.dart';
+//
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//
+//   // Lock orientation to portrait by default
+//   await SystemChrome.setPreferredOrientations([
+//     DeviceOrientation.portraitUp,
+//     DeviceOrientation.portraitDown,
+//   ]);
+//
+//   runApp(const MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return GetMaterialApp(
+//       title: 'InFly',
+//       debugShowCheckedModeBanner: false,
+//       initialRoute: Routes.splash,
+//       getPages: [
+//         ...AppPages.routes,
+//         GetPage(name: Routes.splash, page: () => const SplashScreen()),
+//       ],
+//       initialBinding: AppBinding(),
+//       theme: AppTheme.light,
+//       darkTheme: AppTheme.dark,
+//     );
+//   }
+// }
+//
+// class SplashScreen extends StatefulWidget {
+//   const SplashScreen({super.key});
+//
+//   @override
+//   State<SplashScreen> createState() => _SplashScreenState();
+// }
+//
+// class _SplashScreenState extends State<SplashScreen> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Navigate to login screen after 2 seconds
+//     Future.delayed(const Duration(seconds: 2), () {
+//       Get.offNamed(Routes.login);
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       body: Center(
+//         child: Image.asset(
+//           'assets/logo.png',
+//           width: 150,
+//           height: 150,
+//         ),
+//       ),
+//     );
+//   }
+// }
 
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // for orientation
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'app_binding.dart';
 import 'config/app_pages.dart';
 import 'config/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lock orientation to portrait by default
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  try {
+    // Lock orientation to portrait
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (e) {
+    debugPrint("⚠️ Orientation lock failed: $e");
+  }
 
   runApp(const MyApp());
 }
@@ -25,34 +101,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      // Unlock landscape for larger screens (tablet)
-      if (constraints.maxWidth >= 600) {
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight,
-        ]);
-      }
-
-      return GetMaterialApp(
-        title: 'InFly',
-        debugShowCheckedModeBanner: false,
-        initialRoute: Routes.splash,
-        getPages: [
-          ...AppPages.routes,
-          GetPage(name: Routes.splash, page: () => const SplashScreen()),
-        ],
-        initialBinding: AppBinding(),
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-      );
-    });
+    return GetMaterialApp(
+      title: 'InFly',
+      debugShowCheckedModeBanner: false,
+      initialRoute: Routes.splash,
+      getPages: [
+        ...AppPages.routes,
+        GetPage(name: Routes.splash, page: () => const SplashScreen()),
+      ],
+      initialBinding: AppBinding(),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+    );
   }
 }
-
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -66,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Navigate to login screen after 2 seconds
-    Timer(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       Get.offNamed(Routes.login);
     });
   }
@@ -74,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Change background if needed
+      backgroundColor: Colors.white,
       body: Center(
         child: Image.asset(
           'assets/logo.png',

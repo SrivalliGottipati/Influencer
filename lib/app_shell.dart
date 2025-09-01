@@ -18,6 +18,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _index = 0;
+  int _unreadNotifications = 3; // Mock unread count
 
   final List<Widget> _tabs = const [
     DashboardView(),
@@ -46,9 +47,38 @@ class _AppShellState extends State<AppShell> {
       appBar: AppBar(
         title: Text(_tabTitles[_index]), // Dynamic title
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () => setState(() => _index = 4),
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_none),
+                onPressed: () => setState(() => _index = 4),
+              ),
+              if (_unreadNotifications > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$_unreadNotifications',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
