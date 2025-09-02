@@ -47,11 +47,46 @@ class LoginView extends GetView<AuthController> {
                     ),
                     SizedBox(height: context.responsive.spacing(24)),
 
-                    /// Phone Input
-                    AppInput(
-                      controller: phoneCtrl,
-                      label: 'Phone (10 digits)',
-                      keyboardType: TextInputType.phone,
+                    /// Country dropdown + phone input
+                    Row(
+                      children: [
+                        // Country dropdown
+                        Expanded(
+                          flex: 2,
+                          child: DropdownButtonFormField<String>(
+                            value: controller.countryCode.value,
+                            items: const [
+                              DropdownMenuItem(
+                                value: '91',
+                                child: Text("+91"),
+                              ),
+                              DropdownMenuItem(
+                                value: '1',
+                                child: Text("+1"),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) controller.countryCode.value = val;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: "Country",
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Phone input
+                        Expanded(
+                          flex: 4,
+                          child: AppInput(
+                            controller: phoneCtrl,
+                            label: 'Phone',
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: context.responsive.spacing(20)),
 

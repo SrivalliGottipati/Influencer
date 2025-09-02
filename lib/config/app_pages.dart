@@ -36,7 +36,7 @@ import '../features/notifications/notifications_binding.dart';
 class AppPages {
   static final routes = [
     GetPage(name: Routes.splash, page: () => const SplashScreen()),
-    GetPage(name: Routes.login, page: () => const LoginView(), binding: AuthBinding()),
+    GetPage(name: Routes.login, page: () => LoginView(), binding: AuthBinding()),
     GetPage(name: Routes.register, page: () => const RegisterView(), binding: AuthBinding()),
     GetPage(name: Routes.otp, page: () => const OtpView(), binding: AuthBinding()),
 

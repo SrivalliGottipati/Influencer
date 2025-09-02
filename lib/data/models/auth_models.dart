@@ -12,9 +12,10 @@ class RegisterRequest {
 }
 
 class OtpVerifyRequest {
-  OtpVerifyRequest({required this.otp});
+  OtpVerifyRequest({required this.otp, required this.phone});
   final String otp;
-  Map<String, dynamic> toJson() => {'otp': otp};
+  final String phone;
+  Map<String, dynamic> toJson() => {'otp': otp, 'phone': phone};
 }
 
 class AuthUser {
