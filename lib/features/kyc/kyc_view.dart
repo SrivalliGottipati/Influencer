@@ -185,13 +185,13 @@ class KycView extends GetView<KycController> {
   List<Widget> _buildTextField(String label, TextEditingController ctrl,
       {TextInputType keyboardType = TextInputType.text, bool readOnly = false}) {
     return [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+      Text(label, style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
       SizedBox(height: 4),
       TextFormField(
         controller: ctrl,
         keyboardType: keyboardType,
         readOnly: readOnly,
-        decoration: const InputDecoration(border: OutlineInputBorder()),
+        decoration: const InputDecoration(border: OutlineInputBorder(),),
       ),
       SizedBox(height: 12),
     ];

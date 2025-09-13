@@ -356,7 +356,7 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
       ),
       child: SafeArea(
         child: Container(
-          height: resp.isTablet ? 80 : 70,
+          height: resp.isTablet ? 100 : 80,
           padding: EdgeInsets.symmetric(vertical: resp.spacing(8)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

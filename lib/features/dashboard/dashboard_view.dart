@@ -275,7 +275,7 @@ class DashboardView extends GetView<DashboardController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(7, (index) {
                     final value = performanceValues[index];
-                    final barHeight = (value / maxValue) * 150;
+                    final barHeight = (value / maxValue) * 120;
 
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -290,14 +290,14 @@ class DashboardView extends GetView<DashboardController> {
                         SizedBox(height: resp.spacing(4)),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 500 + 100 * index),
-                          width: resp.isTablet ? 28 : 24,
+                          width: resp.isTablet ? 28 : 22,
                           height: barHeight,
                           decoration: BoxDecoration(
                             gradient: AppColors.primaryGradient,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        SizedBox(height: resp.spacing(8)),
+                        SizedBox(height: resp.spacing(7)),
                         Text(
                           days[index],
                           style: AppTextStyles.bodySmall.copyWith(

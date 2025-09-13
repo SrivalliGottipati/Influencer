@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: Routes.splash, page: () => const SplashScreen()),
       ],
       initialBinding: AppBinding(),
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppTheme.light,   // Only light theme
+      themeMode: ThemeMode.light, // Always force light
     );
   }
 }
