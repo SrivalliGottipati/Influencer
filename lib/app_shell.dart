@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:influencer/core/theme/app_colors.dart';
 import 'package:influencer/core/utils/responsive.dart';
+import 'package:influencer/core/services/secure_store.dart';
 import 'package:influencer/features/dashboard/dashboard_view.dart';
 import 'package:influencer/features/upload/upload_view.dart';
-import 'package:influencer/features/referrals/referrals_view.dart';
-import 'package:influencer/features/wallet/wallet_view.dart';
+import 'package:influencer/features/finance/finance_view.dart';
 import 'package:influencer/features/notifications/notification_view.dart';
 import 'package:influencer/features/kyc/kyc_view.dart';
 
@@ -18,13 +18,12 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _index = 0;
-  int _unreadNotifications = 3; // Mock unread count
+  final int _unreadNotifications = 3; // Mock unread count
 
   final List<Widget> _tabs = const [
     DashboardView(),
     UploadView(),
-    ReferralsView(),
-    WalletView(),
+    FinanceView(),
     NotificationsView(),
     KycView(), // Profile tab
   ];
@@ -32,13 +31,12 @@ class _AppShellState extends State<AppShell> {
   final List<String> _tabTitles = [
     'InFly',
     'Upload',
-    'Referrals',
-    'Wallet',
+    'Finance',
     'Notifications',
     'Profile / KYC',
   ];
 
-  void _openProfile() => setState(() => _index = 5);
+  void _openProfile() => setState(() => _index = 4);
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +49,7 @@ class _AppShellState extends State<AppShell> {
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_none),
-                onPressed: () => setState(() => _index = 4),
+                onPressed: () => setState(() => _index = 3),
               ),
               if (_unreadNotifications > 0)
                 Positioned(
@@ -93,9 +91,8 @@ class _AppShellState extends State<AppShell> {
             children: [
               _flexNavItem(icon: Icons.dashboard, label: 'Home', index: 0),
               _flexNavItem(icon: Icons.upload, label: 'Upload', index: 1),
-              _flexNavItem(icon: Icons.people, label: 'Referrals', index: 2),
-              _flexNavItem(icon: Icons.account_balance_wallet, label: 'Wallet', index: 3),
-              _flexNavItem(icon: Icons.person, label: 'Profile', index: 5),
+              _flexNavItem(icon: Icons.trending_up, label: 'Finance', index: 2),
+              _flexNavItem(icon: Icons.person, label: 'Profile', index: 4),
             ],
           ),
         ),
@@ -160,13 +157,9 @@ class _AppShellState extends State<AppShell> {
                         Navigator.pop(context);
                         setState(() => _index = 1);
                       }),
-                      _drawerItem(icon: Icons.people, label: 'Referrals', onTap: () {
+                      _drawerItem(icon: Icons.trending_up, label: 'Finance', onTap: () {
                         Navigator.pop(context);
                         setState(() => _index = 2);
-                      }),
-                      _drawerItem(icon: Icons.account_balance_wallet, label: 'Wallet', onTap: () {
-                        Navigator.pop(context);
-                        setState(() => _index = 3);
                       }),
                     ]),
                     _drawerSection(title: 'Account', items: [
@@ -176,7 +169,7 @@ class _AppShellState extends State<AppShell> {
                       }),
                       _drawerItem(icon: Icons.notifications, label: 'Notifications', onTap: () {
                         Navigator.pop(context);
-                        setState(() => _index = 4);
+                        setState(() => _index = 3);
                       }),
                     ]),
                   ],
@@ -192,7 +185,14 @@ class _AppShellState extends State<AppShell> {
                 child: ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: const Text('Log out', style: TextStyle(color: Colors.red)),
-                  onTap: () => Get.offAllNamed('/login'),
+                  onTap: () async {
+                    try {
+                      final store = Get.find<SecureStore>();
+                      await store.clearPhone();
+                      await store.clearUserId();
+                    } catch (_) {}
+                    Get.offAllNamed('/login');
+                  },
                 ),
               ),
             ),

@@ -5,6 +5,7 @@ import '../../core/widgets/app_input.dart';
 import '../../core/widgets/app_button.dart';
 import 'auth_controller.dart';
 import '../../config/app_routes.dart';
+import '../../core/utils/validators.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
@@ -12,6 +13,7 @@ class LoginView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     final phoneCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       body: Center(
@@ -26,7 +28,9 @@ class LoginView extends GetView<AuthController> {
               ),
               child: Padding(
                 padding: EdgeInsets.all(context.responsive.spacing(20)),
-                child: Obx(() => Column(
+                child: Obx(() => Form(
+                  key: formKey,
+                  child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -84,6 +88,11 @@ class LoginView extends GetView<AuthController> {
                             controller: phoneCtrl,
                             label: 'Phone',
                             keyboardType: TextInputType.phone,
+                            validator: (v) {
+                              final t = (v ?? '').trim();
+                              if (!Validators.isPhone(t)) return 'Enter 10-digit phone';
+                              return null;
+                            },
                           ),
                         ),
                       ],
@@ -96,6 +105,7 @@ class LoginView extends GetView<AuthController> {
                       loading: controller.loading.value,
                       onPressed: () {
                         controller.phone.value = phoneCtrl.text.trim();
+                        if (!formKey.currentState!.validate()) return;
                         controller.sendLoginOtp();
                       },
                     ),
@@ -107,7 +117,7 @@ class LoginView extends GetView<AuthController> {
                       child: const Text("New user? Register"),
                     ),
                   ],
-                )),
+                ))),
               ),
             ),
           ),

@@ -7,7 +7,7 @@ class NotificationService {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.success.withOpacity(0.9),
+      backgroundColor: AppColors.success.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 3),
@@ -21,7 +21,7 @@ class NotificationService {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.danger.withOpacity(0.9),
+      backgroundColor: AppColors.danger.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 4),
@@ -35,7 +35,7 @@ class NotificationService {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.accent.withOpacity(0.9),
+      backgroundColor: AppColors.accent.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 3),
@@ -49,7 +49,7 @@ class NotificationService {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.warning.withOpacity(0.9),
+      backgroundColor: AppColors.warning.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 4),

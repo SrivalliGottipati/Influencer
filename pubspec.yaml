@@ -46,6 +46,8 @@ dependencies:
   vector_math:
   flutter_launcher_icons:
   shared_preferences:
+  path_provider:
+  path:
 
 
 flutter_icons:

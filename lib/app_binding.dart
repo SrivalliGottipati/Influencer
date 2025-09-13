@@ -9,7 +9,7 @@ import 'data/repositories/auth_repository.dart';
 import 'data/repositories/kyc_repository.dart';
 import 'data/repositories/video_repository.dart';
 import 'data/repositories/referral_repository.dart';
-import 'data/repositories/wallet_repository.dart';
+import 'data/repositories/finance_repository.dart';
 
 class AppBinding extends Bindings {
   @override
@@ -28,7 +28,7 @@ class AppBinding extends Bindings {
     Get.put<KycRepository>(KycRepository(), permanent: true);
     Get.put<IVideoRepository>(VideoRepository(Get.find()), permanent: true);
     Get.put<IReferralRepository>(ReferralRepository(Get.find()), permanent: true);
-    Get.put<IWalletRepository>(WalletRepository(Get.find()), permanent: true);
+    Get.put<FinanceRepository>(FinanceRepositoryImpl(Get.find()), permanent: true);
 
     // Auth repository now has everything it needs
     Get.put<IAuthRepository>(

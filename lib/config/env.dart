@@ -3,6 +3,9 @@ class Env {
   static const bool useMocks = true; // ✅ mocks for everything except OTP
   static const bool useWhatsAppOtp = true; // ✅ always live for OTP
 
+  /// API Base URL
+  static const String baseUrl = 'https://api.infly.app';
+  
   /// WhatsApp API credentials
   static const String waBaseUrl = 'https://whatsapp.devsecit.com/send-message';
   static const String waApiKey  = 'rQnSOZ9zXWz65BQQyUtoKEs0lmQoc3';

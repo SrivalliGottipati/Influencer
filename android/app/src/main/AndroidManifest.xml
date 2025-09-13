@@ -10,6 +10,8 @@
         android:maxSdkVersion="29"/>
     <!-- Android 13+ needs new media permission -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:label="InFly"

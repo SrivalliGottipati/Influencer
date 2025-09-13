@@ -24,4 +24,8 @@ class DashboardController extends GetxController {
       NotificationService.showError('Error', 'Failed loading dashboard');
     }
   }
+
+  Future<void> loadData() async {
+    await load();
+  }
 }

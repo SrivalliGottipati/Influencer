@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'app_binding.dart';
+import 'core/services/secure_store.dart';
 import 'config/app_pages.dart';
 import 'config/app_routes.dart';
 import 'core/theme/app_theme.dart';
@@ -54,10 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigate to login screen after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.offNamed(Routes.login);
-    });
+    _decideStartRoute();
   }
 
   @override
@@ -73,5 +71,26 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+}
+
+Future<void> _decideStartRoute() async {
+  // Small splash delay
+  await Future.delayed(const Duration(milliseconds: 800));
+
+  try {
+    final store = Get.find<SecureStore>();
+    final savedPhone = await store.getPhone();
+    final savedUserId = await store.getUserId();
+
+    if ((savedPhone != null && savedPhone.isNotEmpty) ||
+        (savedUserId != null && savedUserId.isNotEmpty)) {
+      Get.offAllNamed(Routes.shell);
+      return;
+    }
+  } catch (e) {
+    debugPrint('⚠️ Auto-login check failed: $e');
+  }
+
+  Get.offAllNamed(Routes.login);
 }
 

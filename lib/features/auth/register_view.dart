@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:influencer/core/utils/responsive.dart';
-import '../../core/widgets/app_input.dart';
+
 import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_input.dart';
 import 'auth_controller.dart';
+import '../../core/utils/validators.dart';
 
 class RegisterView extends GetView<AuthController> {
   const RegisterView({super.key});
@@ -12,6 +14,8 @@ class RegisterView extends GetView<AuthController> {
   Widget build(BuildContext context) {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       body: Center(
@@ -26,7 +30,9 @@ class RegisterView extends GetView<AuthController> {
               ),
               child: Padding(
                 padding: EdgeInsets.all(context.responsive.spacing(20)),
-                child: Obx(() => Column(
+                child: Obx(() => Form(
+                  key: formKey,
+                  child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -47,41 +53,61 @@ class RegisterView extends GetView<AuthController> {
                     ),
                     SizedBox(height: context.responsive.spacing(24)),
 
-                    /// Full Name
                     AppInput(
                       controller: nameCtrl,
                       label: 'Full Name',
+                      validator: (v) {
+                        if (!Validators.nonEmpty((v ?? ''))) return 'Name is required';
+                        return null;
+                      },
                     ),
                     SizedBox(height: context.responsive.spacing(16)),
 
-                    /// Phone
                     AppInput(
                       controller: phoneCtrl,
                       label: 'Phone (10 digits)',
                       keyboardType: TextInputType.phone,
+                      validator: (v) {
+                        final t = (v ?? '').trim();
+                        if (!Validators.isPhone(t)) return 'Enter 10-digit phone';
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: context.responsive.spacing(16)),
+
+                    AppInput(
+                      controller: emailCtrl,
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) {
+                        final t = (v ?? '').trim();
+                        if (!Validators.isEmail(t)) return 'Enter a valid email';
+                        return null;
+                      },
                     ),
                     SizedBox(height: context.responsive.spacing(20)),
 
-                    /// Register Button
                     AppButton(
                       label: 'Register & Send OTP',
                       loading: controller.loading.value,
                       onPressed: () {
-                        controller.name.value = nameCtrl.text.trim();
+                        controller.name.value  = nameCtrl.text.trim();
                         controller.phone.value = phoneCtrl.text.trim();
+                        controller.email.value = emailCtrl.text.trim();
+                        if (!formKey.currentState!.validate()) return;
                         controller.register();
                       },
                     ),
 
+
                     SizedBox(height: context.responsive.spacing(12)),
 
-                    /// Already have an account
                     TextButton(
                       onPressed: () => Get.back(),
                       child: const Text("Already have an account? Login"),
                     ),
                   ],
-                )),
+                ))),
               ),
             ),
           ),
@@ -90,3 +116,4 @@ class RegisterView extends GetView<AuthController> {
     );
   }
 }
+

@@ -6,8 +6,7 @@ abstract class Routes {
   static const kyc = '/kyc';
   static const dashboard = '/';
   static const upload = '/upload';
-  static const referrals = '/referrals';
-  static const wallet = '/wallet';
+  static const finance = '/finance';
   static const notifications = '/notifications';
   static const shell = '/shell';
 }
