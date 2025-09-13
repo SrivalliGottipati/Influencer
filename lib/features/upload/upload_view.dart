@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:influencer/core/theme/app_colors.dart';
-import 'package:influencer/core/theme/app_text_styles.dart';
+import 'package:influencer/core/theme/text_styles.dart';
 import 'package:influencer/core/utils/responsive.dart';
 import 'package:influencer/core/services/notification_service.dart';
 import '../../core/widgets/app_input.dart';
 import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_badge.dart';
+import '../../core/widgets/app_loading.dart';
 import 'upload_controller.dart';
 
 class UploadView extends GetView<UploadController> {
@@ -16,7 +19,7 @@ class UploadView extends GetView<UploadController> {
     final urlController = TextEditingController();
     
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg,
       body: CustomScrollView(
         slivers: [
           SliverPadding(
@@ -39,57 +42,16 @@ class UploadView extends GetView<UploadController> {
     );
   }
 
-  Widget _buildAppBar(Responsive resp) {
-    return SliverAppBar(
-      expandedHeight: resp.isTablet ? 120 : 100,
-      floating: false,
-      pinned: true,
-      backgroundColor: AppColors.primary,
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'Upload Video',
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.help_outline, color: Colors.white),
-          onPressed: () => NotificationService.showInfo('Help', 'Upload help coming soon'),
-        ),
-        SizedBox(width: resp.spacing(8)),
-      ],
-    );
-  }
-
   Widget _buildHeader(Responsive resp) {
     return Container(
       padding: EdgeInsets.all(resp.spacing(24)),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.accent, AppColors.accentLight],
+          colors: [AppColors.primaryLight, AppColors.primaryLighter],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: Row(
         children: [

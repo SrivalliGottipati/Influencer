@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import '../../data/models/auth_models.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -18,6 +20,21 @@ class AuthController extends GetxController {
 
   void _snack(String title, String msg) =>
       Get.snackbar(title, msg, snackPosition: SnackPosition.BOTTOM);
+
+  final resendTimer = 0.obs;
+  Timer? _timer;
+
+  void startResendTimer() {
+    resendTimer.value = 30; // seconds
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (resendTimer.value > 0) {
+        resendTimer.value--;
+      } else {
+        t.cancel();
+      }
+    });
+  }
 
   Future<void> sendLoginOtp() async {
     if (!Validators.isPhone(phone.value)) {
@@ -41,6 +58,7 @@ class AuthController extends GetxController {
 
       await repo.login(LoginRequest(phone: fullPhone));
       _snack('OTP Sent', 'OTP sent to $fullPhone');
+      startResendTimer();
       Get.toNamed(Routes.otp);
     } catch (e) {
       print("❌ sendLoginOtp error: $e");

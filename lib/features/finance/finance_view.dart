@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:influencer/core/theme/app_colors.dart';
+import 'package:influencer/core/theme/text_styles.dart';
 import 'package:influencer/core/utils/responsive.dart';
 import 'package:influencer/core/services/notification_service.dart';
 import 'package:influencer/data/models/finance_models.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_badge.dart';
+import '../../core/widgets/app_loading.dart';
+import '../../core/widgets/app_button.dart';
 import 'finance_controller.dart';
 
 class FinanceView extends GetView<FinanceController> {
@@ -14,32 +19,34 @@ class FinanceView extends GetView<FinanceController> {
     final resp = context.responsive;
     
     return Scaffold(
+      backgroundColor: AppColors.bg,
       body: Obx(() {
         if (controller.isLoading.value && controller.summary.value == null) {
-          return const Center(child: CircularProgressIndicator());
+          return AppLoading(message: 'Loading financial data...');
         }
 
         return RefreshIndicator(
           onRefresh: controller.refreshData,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.all(resp.spacing(16)),
+            padding: EdgeInsets.all(resp.spacing(20)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context, resp),
-                SizedBox(height: resp.spacing(20)),
+                SizedBox(height: resp.spacing(24)),
                 _buildBalanceCard(context, resp),
-                SizedBox(height: resp.spacing(20)),
+                SizedBox(height: resp.spacing(24)),
                 _buildQuickActions(context, resp),
-                SizedBox(height: resp.spacing(20)),
+                SizedBox(height: resp.spacing(24)),
                 _buildEarningsOverview(context, resp),
-                SizedBox(height: resp.spacing(20)),
+                SizedBox(height: resp.spacing(24)),
                 _buildReferralSection(context, resp),
-                SizedBox(height: resp.spacing(20)),
+                SizedBox(height: resp.spacing(24)),
                 _buildTransactionsHeader(context, resp),
-                SizedBox(height: resp.spacing(12)),
+                SizedBox(height: resp.spacing(16)),
                 _buildTransactionsList(context, resp),
+                SizedBox(height: resp.spacing(100)), // Bottom padding
               ],
             ),
           ),
@@ -57,27 +64,32 @@ class FinanceView extends GetView<FinanceController> {
             children: [
               Text(
                 'Finance',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.headlineLarge.copyWith(
+                  fontWeight: FontWeight.w700,
                   color: AppColors.ink,
                 ),
               ),
-              SizedBox(height: resp.spacing(4)),
+              SizedBox(height: resp.spacing(8)),
               Text(
                 'Manage your earnings and transactions',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.muted,
                 ),
               ),
             ],
           ),
         ),
-        IconButton(
-          onPressed: controller.refreshData,
-          icon: const Icon(Icons.refresh),
-          style: IconButton.styleFrom(
-            backgroundColor: AppColors.primary.withOpacity(0.1),
-            foregroundColor: AppColors.primary,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.primaryLighter.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            onPressed: controller.refreshData,
+            icon: const Icon(Icons.refresh_rounded),
+            style: IconButton.styleFrom(
+              foregroundColor: AppColors.primary,
+            ),
           ),
         ),
       ],
@@ -88,69 +100,80 @@ class FinanceView extends GetView<FinanceController> {
     final summary = controller.summary.value;
     if (summary == null) return const SizedBox.shrink();
 
-    return Container(
-      padding: EdgeInsets.all(resp.spacing(20)),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.account_balance_wallet, color: Colors.white, size: 24),
-              SizedBox(width: resp.spacing(8)),
-              Text(
-                'Total Balance',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.9),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: resp.spacing(12)),
-          Text(
-            '₹${summary.balance.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return AppCard(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        padding: EdgeInsets.all(resp.spacing(24)),
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-          ),
-          SizedBox(height: resp.spacing(16)),
-          Row(
-            children: [
-              Expanded(
-                child: _buildBalanceItem(
-                  context,
-                  'Pending',
-                  '₹${summary.pendingAmount.toStringAsFixed(2)}',
-                  Icons.schedule,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(resp.spacing(8)),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_wallet,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
-              ),
-              SizedBox(width: resp.spacing(16)),
-              Expanded(
-                child: _buildBalanceItem(
-                  context,
-                  'Transactions',
-                  '${summary.totalTransactions}',
-                  Icons.receipt_long,
+                SizedBox(width: resp.spacing(12)),
+                Text(
+                  'Total Balance',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+              ],
+            ),
+            SizedBox(height: resp.spacing(16)),
+            Text(
+              '₹${summary.balance.toStringAsFixed(2)}',
+              style: AppTextStyles.displayLarge.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
               ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(height: resp.spacing(20)),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildBalanceItem(
+                    context,
+                    'Pending',
+                    '₹${summary.pendingAmount.toStringAsFixed(2)}',
+                    Icons.schedule,
+                  ),
+                ),
+                SizedBox(width: resp.spacing(16)),
+                Expanded(
+                  child: _buildBalanceItem(
+                    context,
+                    'Transactions',
+                    '${summary.totalTransactions}',
+                    Icons.receipt_long,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -159,21 +182,22 @@ class FinanceView extends GetView<FinanceController> {
     return Row(
       children: [
         Icon(icon, color: Colors.white.withOpacity(0.8), size: 16),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: AppTextStyles.titleMedium.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: 2),
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: AppTextStyles.bodySmall.copyWith(
                   color: Colors.white.withOpacity(0.8),
                 ),
               ),
@@ -190,12 +214,12 @@ class FinanceView extends GetView<FinanceController> {
       children: [
         Text(
           'Quick Actions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
         ),
-        SizedBox(height: resp.spacing(12)),
+        SizedBox(height: resp.spacing(16)),
         Row(
           children: [
             Expanded(
@@ -230,24 +254,25 @@ class FinanceView extends GetView<FinanceController> {
     Color color,
     VoidCallback onTap,
   ) {
-    return InkWell(
+    final resp = context.responsive;
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
+      child: AppCard(
         child: Column(
           children: [
-            Icon(icon, color: color, size: 28),
-            SizedBox(height: 8),
+            Container(
+              padding: EdgeInsets.all(resp.spacing(12)),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            SizedBox(height: resp.spacing(12)),
             Text(
               label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: color,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -266,31 +291,29 @@ class FinanceView extends GetView<FinanceController> {
       children: [
         Text(
           'Earnings Overview',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
         ),
-        SizedBox(height: resp.spacing(12)),
+        SizedBox(height: resp.spacing(16)),
         Row(
           children: [
             Expanded(
-              child: _buildEarningCard(
-                context,
-                'Today',
-                '₹${stats.todayEarnings.toStringAsFixed(2)}',
-                Icons.today,
-                AppColors.success,
+              child: AppStatCard(
+                title: 'Today',
+                value: '₹${stats.todayEarnings.toStringAsFixed(2)}',
+                icon: Icons.today,
+                iconColor: AppColors.success,
               ),
             ),
             SizedBox(width: resp.spacing(12)),
             Expanded(
-              child: _buildEarningCard(
-                context,
-                'This Week',
-                '₹${stats.weeklyEarnings.toStringAsFixed(2)}',
-                Icons.date_range,
-                AppColors.accent,
+              child: AppStatCard(
+                title: 'This Week',
+                value: '₹${stats.weeklyEarnings.toStringAsFixed(2)}',
+                icon: Icons.date_range,
+                iconColor: AppColors.accent,
               ),
             ),
           ],
@@ -299,22 +322,20 @@ class FinanceView extends GetView<FinanceController> {
         Row(
           children: [
             Expanded(
-              child: _buildEarningCard(
-                context,
-                'This Month',
-                '₹${stats.monthlyEarnings.toStringAsFixed(2)}',
-                Icons.calendar_month,
-                AppColors.primary,
+              child: AppStatCard(
+                title: 'This Month',
+                value: '₹${stats.monthlyEarnings.toStringAsFixed(2)}',
+                icon: Icons.calendar_month,
+                iconColor: AppColors.primary,
               ),
             ),
             SizedBox(width: resp.spacing(12)),
             Expanded(
-              child: _buildEarningCard(
-                context,
-                'Total',
-                '₹${stats.totalEarnings.toStringAsFixed(2)}',
-                Icons.trending_up,
-                AppColors.secondary,
+              child: AppStatCard(
+                title: 'Total',
+                value: '₹${stats.totalEarnings.toStringAsFixed(2)}',
+                icon: Icons.trending_up,
+                iconColor: AppColors.secondary,
               ),
             ),
           ],
@@ -384,8 +405,8 @@ class FinanceView extends GetView<FinanceController> {
       children: [
         Text(
           'Recent Transactions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
         ),
@@ -394,7 +415,13 @@ class FinanceView extends GetView<FinanceController> {
           onPressed: () {
             // Navigate to full transactions list
           },
-          child: const Text('View All'),
+          child: Text(
+            'View All',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
@@ -404,34 +431,22 @@ class FinanceView extends GetView<FinanceController> {
     final transactions = controller.filteredTransactions.take(5).toList();
     
     if (transactions.isEmpty) {
-      return Container(
-        padding: EdgeInsets.all(resp.spacing(32)),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      return AppCard(
         child: Column(
           children: [
             Icon(Icons.receipt_long, size: 48, color: AppColors.muted),
-            SizedBox(height: resp.spacing(12)),
+            SizedBox(height: resp.spacing(16)),
             Text(
               'No transactions yet',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: AppTextStyles.titleMedium.copyWith(
                 color: AppColors.muted,
               ),
             ),
-            SizedBox(height: resp.spacing(4)),
+            SizedBox(height: resp.spacing(8)),
             Text(
-              'Your transactions will appear here',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.muted,
+              'Your transaction history will appear here',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.mutedLight,
               ),
             ),
           ],
@@ -439,18 +454,7 @@ class FinanceView extends GetView<FinanceController> {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return AppCard(
       child: Column(
         children: transactions.map((transaction) => _buildTransactionItem(context, transaction)).toList(),
       ),
@@ -458,48 +462,61 @@ class FinanceView extends GetView<FinanceController> {
   }
 
   Widget _buildTransactionItem(BuildContext context, Transaction transaction) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: transaction.typeColor?.withOpacity(0.1) ?? AppColors.primary.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          transaction.typeIcon,
-          color: transaction.typeColor ?? AppColors.primary,
-          size: 20,
-        ),
-      ),
-      title: Text(
-        transaction.title,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      subtitle: Text(
-        transaction.description,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.muted,
-        ),
-      ),
-      trailing: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.center,
+    final resp = context.responsive;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: resp.spacing(8)),
+      child: Row(
         children: [
-          Text(
-            transaction.formattedAmount,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: transaction.isCredit ? AppColors.success : AppColors.danger,
-              fontWeight: FontWeight.bold,
+          Container(
+            padding: EdgeInsets.all(resp.spacing(8)),
+            decoration: BoxDecoration(
+              color: transaction.typeColor?.withOpacity(0.1) ?? AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              transaction.typeIcon,
+              color: transaction.typeColor ?? AppColors.primary,
+              size: 20,
             ),
           ),
-          Text(
-            transaction.statusText,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: transaction.statusColor,
-              fontWeight: FontWeight.w600,
+          SizedBox(width: resp.spacing(16)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.title,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+                SizedBox(height: resp.spacing(2)),
+                Text(
+                  transaction.description,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.muted,
+                  ),
+                ),
+              ],
             ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                transaction.formattedAmount,
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: transaction.isCredit ? AppColors.success : AppColors.danger,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: resp.spacing(2)),
+              AppStatusBadge(
+                status: transaction.statusText,
+                type: transaction.isCredit ? AppBadgeType.success : AppBadgeType.danger,
+              ),
+            ],
           ),
         ],
       ),

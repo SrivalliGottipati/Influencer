@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:influencer/core/theme/app_colors.dart';
-import 'package:influencer/core/theme/app_text_styles.dart';
+import 'package:influencer/core/theme/text_styles.dart';
 import 'package:influencer/core/utils/responsive.dart';
 import 'package:influencer/core/services/notification_service.dart';
-import '../../core/widgets/info_card.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_badge.dart';
+import '../../core/widgets/app_loading.dart';
 import 'dashboard_controller.dart';
 
 class DashboardView extends GetView<DashboardController> {
@@ -15,7 +17,7 @@ class DashboardView extends GetView<DashboardController> {
     final resp = context.responsive;
     
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg,
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.loadData();
@@ -24,33 +26,26 @@ class DashboardView extends GetView<DashboardController> {
         child: CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: EdgeInsets.all(resp.spacing(16)),
+              padding: EdgeInsets.all(resp.spacing(20)),
               sliver: Obx(() {
                 final s = controller.summary.value;
                 if (s == null) {
                   return SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(color: AppColors.primary),
-                          SizedBox(height: resp.spacing(16)),
-                          Text('Loading dashboard...', style: AppTextStyles.bodyMedium),
-                        ],
-                      ),
+                    child: AppLoading(
+                      message: 'Loading dashboard...',
                     ),
                   );
                 }
 
                 return SliverList(
                   delegate: SliverChildListDelegate([
-                    _buildWelcomeCard(resp),
-                    SizedBox(height: resp.spacing(20)),
+                    _buildWelcomeSection(resp),
+                    SizedBox(height: resp.spacing(24)),
                     _buildStatsGrid(resp, s),
                     SizedBox(height: resp.spacing(24)),
-                    _buildPerformanceChart(resp),
-                    SizedBox(height: resp.spacing(24)),
                     _buildQuickActions(resp),
+                    SizedBox(height: resp.spacing(24)),
+                    _buildPerformanceChart(resp),
                     SizedBox(height: resp.spacing(24)),
                     _buildTopVideos(resp),
                     SizedBox(height: resp.spacing(24)),
@@ -100,55 +95,89 @@ class DashboardView extends GetView<DashboardController> {
     );
   }
 
-  Widget _buildWelcomeCard(Responsive resp) {
-    return Container(
-      padding: EdgeInsets.all(resp.spacing(20)),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.accent, AppColors.accentLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+  Widget _buildWelcomeSection(Responsive resp) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Good morning! 👋',
+          style: AppTextStyles.headlineLarge.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
           ),
-        ],
-      ),
+        ),
+        SizedBox(height: resp.spacing(8)),
+        Text(
+          'Ready to create amazing content today?',
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: AppColors.muted,
+          ),
+        ),
+        SizedBox(height: resp.spacing(20)),
+        _buildWelcomeCard(resp),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeCard(Responsive resp) {
+    return AppCard(
+      backgroundColor: AppColors.surface,
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(resp.spacing(8)),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.trending_up,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    SizedBox(width: resp.spacing(12)),
+                    Text(
+                      'Today\'s Performance',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: resp.spacing(16)),
                 Text(
-                  'Welcome back! 👋',
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  'You\'re doing great! Keep up the momentum.',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.muted,
                   ),
                 ),
-                SizedBox(height: resp.spacing(8)),
-                Text(
-                  'Ready to create amazing content?',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
+                SizedBox(height: resp.spacing(12)),
+                Row(
+                  children: [
+                    AppStatusBadge(status: 'Active'),
+                    SizedBox(width: resp.spacing(8)),
+                    AppStatusBadge(status: 'Trending', type: AppBadgeType.success),
+                  ],
                 ),
               ],
             ),
           ),
           Container(
-            padding: EdgeInsets.all(resp.spacing(12)),
+            padding: EdgeInsets.all(resp.spacing(16)),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
-              Icons.trending_up,
+              Icons.rocket_launch,
               color: Colors.white,
               size: resp.isTablet ? 32 : 28,
             ),
@@ -159,196 +188,131 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildStatsGrid(Responsive resp, dynamic s) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: resp.isTablet ? 3 : 2,
-      crossAxisSpacing: resp.spacing(16),
-      mainAxisSpacing: resp.spacing(16),
-      childAspectRatio: resp.isTablet ? 1.5 : 1.3,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildStatCard(
-          resp,
-          'Total Videos',
-          '${s.total}',
-          Icons.video_collection,
-          AppColors.primary,
+        Text(
+          'Overview',
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
         ),
-        _buildStatCard(
-          resp,
-          'Total Views',
-          '${s.views}',
-          Icons.visibility,
-          AppColors.secondary,
-        ),
-        _buildStatCard(
-          resp,
-          'Earnings',
-          '₹${s.earnings.toStringAsFixed(0)}',
-          Icons.currency_rupee,
-          AppColors.success,
-        ),
-        _buildStatCard(
-          resp,
-          'This Month',
-          '₹${(s.earnings * 0.3).toStringAsFixed(0)}',
-          Icons.calendar_month,
-          AppColors.warning,
+        SizedBox(height: resp.spacing(16)),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: resp.isTablet ? 3 : 2,
+          crossAxisSpacing: resp.spacing(16),
+          mainAxisSpacing: resp.spacing(16),
+          childAspectRatio: resp.isTablet ? 1.4 : 1.2,
+          children: [
+            AppStatCard(
+              title: 'Total Videos',
+              value: '${s.total}',
+              icon: Icons.video_collection,
+              iconColor: AppColors.primary,
+            ),
+            AppStatCard(
+              title: 'Total Views',
+              value: '${s.views}',
+              icon: Icons.visibility,
+              iconColor: AppColors.secondary,
+            ),
+            AppStatCard(
+              title: 'Earnings',
+              value: '₹${s.earnings.toStringAsFixed(0)}',
+              icon: Icons.currency_rupee,
+              iconColor: AppColors.success,
+            ),
+            AppStatCard(
+              title: 'This Month',
+              value: '₹${(s.earnings * 0.3).toStringAsFixed(0)}',
+              icon: Icons.calendar_month,
+              iconColor: AppColors.warning,
+            ),
+          ],
         ),
       ],
     );
   }
 
 
-  Widget _buildStatCard(Responsive resp, String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: EdgeInsets.all(resp.spacing(16)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.neutral.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.all(resp.spacing(8)),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color, size: resp.isTablet ? 24 : 18),
-              ),
-              Icon(Icons.more_vert, color: AppColors.neutral, size: 16),
-            ],
-          ),
-          SizedBox(height: resp.spacing(5)),
-          Text(
-            value,
-            style: AppTextStyles.headlineSmall.copyWith(
-              color: AppColors.ink,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: resp.spacing(4)),
-          Text(
-            title,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.neutral,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPerformanceChart(Responsive resp) {
     final performanceValues = [100, 200, 150, 300, 250, 400, 380];
     final maxValue = performanceValues.reduce((a, b) => a > b ? a : b);
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    return Container(
-      padding: EdgeInsets.all(resp.spacing(20)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.neutral.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Performance',
-                style: AppTextStyles.titleLarge.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.ink,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Performance',
+              style: AppTextStyles.headlineMedium.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: resp.spacing(12),
-                  vertical: resp.spacing(6),
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'This Week',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+            ),
+            AppBadge(
+              text: 'This Week',
+              type: AppBadgeType.primary,
+            ),
+          ],
+        ),
+        SizedBox(height: resp.spacing(16)),
+        AppCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 200,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(7, (index) {
+                    final value = performanceValues[index];
+                    final barHeight = (value / maxValue) * 150;
+
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$value',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                        SizedBox(height: resp.spacing(4)),
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 500 + 100 * index),
+                          width: resp.isTablet ? 28 : 24,
+                          height: barHeight,
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        SizedBox(height: resp.spacing(8)),
+                        Text(
+                          days[index],
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.muted,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
                 ),
               ),
             ],
           ),
-          SizedBox(height: resp.spacing(24)),
-          SizedBox(
-            height: 200,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (index) {
-                final value = performanceValues[index];
-                final barHeight = (value / maxValue) * 150;
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      '$value',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                    SizedBox(height: resp.spacing(4)),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 500 + 100 * index),
-                      width: resp.isTablet ? 28 : 24,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.primary, AppColors.secondary],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    SizedBox(height: resp.spacing(8)),
-                    Text(
-                      days[index],
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.neutral,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -358,8 +322,8 @@ class DashboardView extends GetView<DashboardController> {
       children: [
         Text(
           'Quick Actions',
-          style: AppTextStyles.titleLarge.copyWith(
-            fontWeight: FontWeight.bold,
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
         ),
@@ -370,7 +334,7 @@ class DashboardView extends GetView<DashboardController> {
               child: _buildActionButton(
                 resp,
                 'Upload Video',
-                Icons.upload,
+                Icons.upload_outlined,
                 AppColors.primary,
                 () => NotificationService.showInfo('Upload', 'Upload feature coming soon'),
               ),
@@ -380,9 +344,33 @@ class DashboardView extends GetView<DashboardController> {
               child: _buildActionButton(
                 resp,
                 'View Analytics',
-                Icons.analytics,
+                Icons.analytics_outlined,
                 AppColors.secondary,
                 () => NotificationService.showInfo('Analytics', 'Analytics feature coming soon'),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: resp.spacing(12)),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionButton(
+                resp,
+                'Earnings',
+                Icons.currency_rupee,
+                AppColors.success,
+                () => NotificationService.showInfo('Earnings', 'Earnings feature coming soon'),
+              ),
+            ),
+            SizedBox(width: resp.spacing(12)),
+            Expanded(
+              child: _buildActionButton(
+                resp,
+                'Settings',
+                Icons.settings_outlined,
+                AppColors.muted,
+                () => NotificationService.showInfo('Settings', 'Settings feature coming soon'),
               ),
             ),
           ],
@@ -394,21 +382,27 @@ class DashboardView extends GetView<DashboardController> {
   Widget _buildActionButton(Responsive resp, String title, IconData icon, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(resp.spacing(16)),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-        ),
+      child: AppCard(
+        backgroundColor: AppColors.surface,
         child: Column(
           children: [
-            Icon(icon, color: color, size: resp.isTablet ? 32 : 28),
-            SizedBox(height: resp.spacing(8)),
+            Container(
+              padding: EdgeInsets.all(resp.spacing(12)),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: resp.isTablet ? 24 : 20,
+              ),
+            ),
+            SizedBox(height: resp.spacing(12)),
             Text(
               title,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: color,
+                color: AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -428,14 +422,20 @@ class DashboardView extends GetView<DashboardController> {
           children: [
             Text(
               'Top Videos',
-              style: AppTextStyles.titleLarge.copyWith(
-                fontWeight: FontWeight.bold,
+              style: AppTextStyles.headlineMedium.copyWith(
+                fontWeight: FontWeight.w700,
                 color: AppColors.ink,
               ),
             ),
             TextButton(
               onPressed: () => NotificationService.showInfo('View All', 'View all videos feature coming soon'),
-              child: Text('View All', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary)),
+              child: Text(
+                'View All',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
@@ -446,39 +446,31 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildVideoItem(Responsive resp, int index) {
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: resp.spacing(12)),
-      padding: EdgeInsets.all(resp.spacing(16)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.neutral.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
             width: resp.isTablet ? 60 : 50,
             height: resp.isTablet ? 60 : 50,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.play_circle_fill, color: AppColors.primary),
+            child: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
-          SizedBox(width: resp.spacing(12)),
+          SizedBox(width: resp.spacing(16)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Video #${index + 1}',
-                  style: AppTextStyles.bodyLarge.copyWith(
+                  style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.ink,
                   ),
@@ -487,7 +479,7 @@ class DashboardView extends GetView<DashboardController> {
                 Text(
                   '${(index + 1) * 5000} views',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.neutral,
+                    color: AppColors.muted,
                   ),
                 ),
               ],
@@ -498,28 +490,14 @@ class DashboardView extends GetView<DashboardController> {
             children: [
               Text(
                 '₹${(index + 1) * 150}',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.amount.copyWith(
                   color: AppColors.success,
                 ),
               ),
               SizedBox(height: resp.spacing(4)),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: resp.spacing(8),
-                  vertical: resp.spacing(2),
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Trending',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              AppStatusBadge(
+                status: 'Trending',
+                type: AppBadgeType.success,
               ),
             ],
           ),
@@ -534,25 +512,13 @@ class DashboardView extends GetView<DashboardController> {
       children: [
         Text(
           'Recent Activity',
-          style: AppTextStyles.titleLarge.copyWith(
-            fontWeight: FontWeight.bold,
+          style: AppTextStyles.headlineMedium.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
         ),
         SizedBox(height: resp.spacing(16)),
-        Container(
-          padding: EdgeInsets.all(resp.spacing(16)),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.neutral.withValues(alpha: 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+        AppCard(
           child: Column(
             children: [
               _buildActivityItem(resp, 'Video uploaded', '2 hours ago', Icons.upload, AppColors.primary),
@@ -575,12 +541,12 @@ class DashboardView extends GetView<DashboardController> {
           Container(
             padding: EdgeInsets.all(resp.spacing(8)),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          SizedBox(width: resp.spacing(12)),
+          SizedBox(width: resp.spacing(16)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -592,10 +558,11 @@ class DashboardView extends GetView<DashboardController> {
                     color: AppColors.ink,
                   ),
                 ),
+                SizedBox(height: resp.spacing(2)),
                 Text(
                   time,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.neutral,
+                    color: AppColors.muted,
                   ),
                 ),
               ],
@@ -610,7 +577,7 @@ class DashboardView extends GetView<DashboardController> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: resp.spacing(4)),
       child: Divider(
-        color: AppColors.neutral.withValues(alpha: 0.2),
+        color: AppColors.divider,
         height: 1,
       ),
     );
